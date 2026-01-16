@@ -3,7 +3,7 @@ package logic
 import "strconv"
 
 func GetSMA(candles [][]string, count int) float64 {
-	total := 0
+	var total float64 = 0
 	last := candles[len(candles)-count:]
 
 	for _, c := range last {
@@ -12,8 +12,8 @@ func GetSMA(candles [][]string, count int) float64 {
 			panic(err)
 		}
 
-		total += int(close)
+		total += close
 	}
 
-	return float64(total) / float64(count)
+	return total / float64(count)
 }

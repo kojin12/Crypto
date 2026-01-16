@@ -6,7 +6,7 @@ func getRS(candles [][]string) ([]float64, []float64) {
 	var supports []float64
 	var resistances []float64
 
-	for i, _ := 1, 0; i < len(candles)-1; i++ {
+	for i := 1; i < len(candles)-1; i++ {
 		floatHigh, _ := strconv.ParseFloat(candles[i][2], 64)
 		floatLow, _ := strconv.ParseFloat(candles[i][3], 64)
 		floatPrevHigh, _ := strconv.ParseFloat(candles[i-1][2], 64)
@@ -24,5 +24,5 @@ func getRS(candles [][]string) ([]float64, []float64) {
 		}
 	}
 
-	return resistances, supports
+	return supports, resistances
 }
