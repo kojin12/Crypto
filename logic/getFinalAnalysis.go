@@ -21,7 +21,7 @@ func Final(candles [][]string, candles60 [][]string) FinalResult {
 	var Res FinalResult
 	var wg sync.WaitGroup
 
-	// Compute EMAs synchronously first
+	
 	Ema50 := GetEMA(candles, 50)
 	Ema200 := GetEMA(candles, 200)
 	Res.Ema50 = Ema50

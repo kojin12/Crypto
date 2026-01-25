@@ -14,7 +14,7 @@ func GetVolume(candles [][]string, period int) string {
 	avg := sum / float64(period)
 	lastCandle, _ := strconv.ParseFloat(candles[len(candles)-1][6], 64)
 	if lastCandle > avg*3 {
-		return "Whale activity"
+		return "Strong Up"
 	}
 	if lastCandle > avg*1.5 {
 		return "Volume up"
