@@ -1,5 +1,7 @@
 package logic
 
+import "fmt"
+
 type FinalResult struct {
 	Ema50      float64
 	Ema200     float64
@@ -17,34 +19,85 @@ type FinalResult struct {
 	ATRPercent float64
 }
 
-func Final(candles [][]string, candles60 [][]string) FinalResult {
+func Final(candles [][]string, candles60 [][]string) (FinalResult, error) {
 	var res FinalResult
 
-	res.Ema50 = GetEMA(candles, 50)
-	res.Ema200 = GetEMA(candles, 200)
+	ema50, err := GetEMA(candles, 50)
+	if err != nil {
+		return res, fmt.Errorf("ema50: %w", err)
+	}
+	res.Ema50 = ema50
+
+	ema200, err := GetEMA(candles, 200)
+	if err != nil {
+		return res, fmt.Errorf("ema200: %w", err)
+	}
+	res.Ema200 = ema200
+
 	res.Trend15 = GetTrend15(res.Ema50, res.Ema200)
 
 	reg := RegCandles(candles)
-	res.ADX = GetADX(reg, 14)
 
-	res.ATRPercent = GetATRPercent(candles, 14)
+	adx, err := GetADX(reg, 14)
+	if err != nil {
+		return res, fmt.Errorf("adx: %w", err)
+	}
+	res.ADX = adx
 
-	ema50_60 := GetEMA(candles60, 50)
-	ema200_60 := GetEMA(candles60, 200)
+	atrPercent, err := GetATRPercent(candles, 14)
+	if err != nil {
+		return res, fmt.Errorf("atr percent: %w", err)
+	}
+	res.ATRPercent = atrPercent
+
+	ema50_60, err := GetEMA(candles60, 50)
+	if err != nil {
+		return res, fmt.Errorf("ema50 60: %w", err)
+	}
+	ema200_60, err := GetEMA(candles60, 200)
+	if err != nil {
+		return res, fmt.Errorf("ema200 60: %w", err)
+	}
 	res.Trend60 = GetTrend60(ema50_60, ema200_60)
 
-	res.Rsi = GetRSI(candles)
+	rsi, err := GetRSI(candles)
+	if err != nil {
+		return res, fmt.Errorf("rsi: %w", err)
+	}
+	res.Rsi = rsi
 	if res.Rsi > 70 {
 		res.RsiFilter = "Dont Buy"
 	} else if res.Rsi < 30 {
 		res.RsiFilter = "Dont Sell"
 	}
 
-	res.MACD = GetMACD(candles)
-	res.Atr = GetATR(candles, 14)
-	res.Volume = GetVolume(candles, 20)
-	res.Patterns = GetPatterns(candles)
-	res.Supports, res.Resistance = GetRS(candles)
+	macd, err := GetMACD(candles)
+	if err != nil {
+		return res, fmt.Errorf("macd: %w", err)
+	}
+	res.MACD = macd
 
-	return res
+	atr, err := GetATR(candles, 14)
+	if err != nil {
+		return res, fmt.Errorf("atr: %w", err)
+	}
+	res.Atr = atr
+
+	volume, err := GetVolume(candles, 20)
+	if err != nil {
+		return res, fmt.Errorf("volume: %w", err)
+	}
+	res.Volume = volume
+
+	patterns := GetPatterns(candles)
+	res.Patterns = patterns
+
+	supports, resistances, err := GetRS(candles)
+	if err != nil {
+		return res, fmt.Errorf("rs: %w", err)
+	}
+	res.Supports = supports
+	res.Resistance = resistances
+
+	return res, nil
 }

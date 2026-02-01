@@ -1,10 +1,17 @@
 package logic
 
-import "math"
+import (
+	"errors"
+	"math"
+)
 
-func GetADX(candles []OHLC, period int) float64 {
+func GetADX(candles []OHLC, period int) (float64, error) {
+	if period <= 0 {
+		return 0, errors.New("period must be greater than 0")
+	}
+
 	if len(candles) < period+1 {
-		return 0
+		return 0, errors.New("not enough candlesticks to calculate ADX")
 	}
 
 	trs := make([]float64, len(candles))
@@ -50,15 +57,17 @@ func GetADX(candles []OHLC, period int) float64 {
 	}
 
 	if smTR == 0 {
-		return 0
+		return 0, errors.New("smoothed true range is zero, cannot calculate DI")
 	}
 
 	diPlus := (smPlus / smTR) * 100
 	diMinus := (smMinus / smTR) * 100
 
-	if diPlus+diMinus == 0 {
-		return 0
+	denominator := diPlus + diMinus
+	if denominator == 0 {
+		return 0, errors.New("sum of DI+ and DI- is zero, cannot calculate ADX")
 	}
 
-	return (math.Abs(diPlus-diMinus) / (diPlus + diMinus)) * 100
+	adx := (math.Abs(diPlus-diMinus) / denominator) * 100
+	return adx, nil
 }

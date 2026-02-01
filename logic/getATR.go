@@ -1,34 +1,52 @@
 package logic
 
 import (
+	"errors"
 	"math"
 	"strconv"
 )
 
-func GetATR(candles [][]string, period int) float64 {
-	var count float64
-	lastCandles := candles[len(candles)-period:]
-
-	for j, _ := range lastCandles {
-		if j == 0 {
-			floatCandleHigh, _ := strconv.ParseFloat(lastCandles[j][2], 64)
-			floatCandleLow, _ := strconv.ParseFloat(lastCandles[j][3], 64)
-
-			tr := floatCandleHigh - floatCandleLow
-			count += tr
-		} else {
-			floatCandleHigh, _ := strconv.ParseFloat(lastCandles[j][2], 64)
-			floatCandleLow, _ := strconv.ParseFloat(lastCandles[j][3], 64)
-			floatCandleClose, _ := strconv.ParseFloat(lastCandles[j-1][4], 64)
-			data := floatCandleHigh - floatCandleLow
-			abs1 := math.Abs(floatCandleHigh - floatCandleClose)
-			abs2 := math.Abs(floatCandleLow - floatCandleClose)
-
-			base := math.Max(data, abs1)
-			tr := math.Max(base, abs2)
-			count += tr
-		}
+func GetATR(candles [][]string, period int) (float64, error) {
+	if period <= 0 {
+		return 0, errors.New("period must be greater than 0")
 	}
 
-	return count / float64(period)
+	if len(candles) < period {
+		return 0, errors.New("not enough candlesticks to calculate ATR")
+	}
+
+	lastCandles := candles[len(candles)-period:]
+	var sumTR float64
+
+	for i := range lastCandles {
+		high, err := strconv.ParseFloat(lastCandles[i][2], 64)
+		if err != nil {
+			return 0, err
+		}
+
+		low, err := strconv.ParseFloat(lastCandles[i][3], 64)
+		if err != nil {
+			return 0, err
+		}
+
+		if i == 0 {
+			tr := high - low
+			sumTR += tr
+			continue
+		}
+
+		prevClose, err := strconv.ParseFloat(lastCandles[i-1][4], 64)
+		if err != nil {
+			return 0, err
+		}
+
+		rangeHL := high - low
+		absHigh := math.Abs(high - prevClose)
+		absLow := math.Abs(low - prevClose)
+
+		tr := math.Max(rangeHL, math.Max(absHigh, absLow))
+		sumTR += tr
+	}
+
+	return sumTR / float64(period), nil
 }
