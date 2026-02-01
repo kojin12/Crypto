@@ -2,7 +2,7 @@ package logic
 
 import "strconv"
 
-func getRS(candles [][]string) ([]float64, []float64) {
+func GetRS(candles [][]string) ([]float64, []float64) {
 	var supports []float64
 	var resistances []float64
 

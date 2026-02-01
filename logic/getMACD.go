@@ -4,7 +4,7 @@ import (
 	"strconv"
 )
 
-func getMACD(candles [][]string) map[string]float64 {
+func GetMACD(candles [][]string) map[string]float64 {
 	var closes []float64
 	var signal float64
 	for _, c := range candles {

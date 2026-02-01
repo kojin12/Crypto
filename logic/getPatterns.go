@@ -1,6 +1,6 @@
 package logic
 
-func getPatterns(candles [][]string) map[string]bool {
+func GetPatterns(candles [][]string) map[string]bool {
 	regsCandles := RegCandles(candles)
 	patternsCandles := make(map[string]bool)
 
