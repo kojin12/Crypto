@@ -1,36 +1,24 @@
 package logic
 
 import (
-	"errors"
 	"strconv"
 )
 
-func GetMACD(candles [][]string) (map[string]float64, error) {
-	if len(candles) == 0 {
-		return nil, errors.New("no candles provided")
-	}
+func GetMACD(candles [][]string) map[string]float64 {
 
 	var closes []float64
 	for _, c := range candles {
-		if len(c) < 5 {
-			return nil, errors.New("invalid candle format")
-		}
+
 		price, err := strconv.ParseFloat(c[4], 64)
 		if err != nil {
-			return nil, err
+			return nil
 		}
 		closes = append(closes, price)
 	}
 
-	ema12, err := GetEMA(candles, 12)
-	if err != nil {
-		return nil, err
-	}
+	ema12 := GetEMA(candles, 12)
 
-	ema26, err := GetEMA(candles, 26)
-	if err != nil {
-		return nil, err
-	}
+	ema26 := GetEMA(candles, 26)
 
 	macdLine := ema12 - ema26
 
@@ -39,25 +27,14 @@ func GetMACD(candles [][]string) (map[string]float64, error) {
 		if i < 26 {
 			continue
 		}
-		ema12I, err := GetEMAFromCloses(closes[:i], 12)
-		if err != nil {
-			return nil, err
-		}
-		ema26I, err := GetEMAFromCloses(closes[:i], 26)
-		if err != nil {
-			return nil, err
-		}
+		ema12I := GetEMAFromCloses(closes[:i], 12)
+
+		ema26I := GetEMAFromCloses(closes[:i], 26)
+
 		macdValues = append(macdValues, ema12I-ema26I)
 	}
 
-	if len(macdValues) < 9 {
-		return nil, errors.New("not enough MACD values to calculate signal line")
-	}
-
-	signal, err := GetEMAFromCloses(macdValues[len(macdValues)-9:], 9)
-	if err != nil {
-		return nil, err
-	}
+	signal := GetEMAFromCloses(macdValues[len(macdValues)-9:], 9)
 
 	histogram := macdLine - signal
 
@@ -67,5 +44,5 @@ func GetMACD(candles [][]string) (map[string]float64, error) {
 		"histogram":  histogram,
 	}
 
-	return result, nil
+	return result
 }

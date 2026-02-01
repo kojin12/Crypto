@@ -7,7 +7,6 @@ import (
 )
 
 type ResultData struct {
-	Status      string
 	PriceChange float64
 }
 
@@ -27,10 +26,8 @@ func GetPriceChangeHandlers(w http.ResponseWriter, r *http.Request) {
 	var ResultDataVar ResultData
 	result, err := coingeckodata.GetPriceChange(pair)
 	if err != nil {
-		ResultDataVar.Status = "error"
 	}
 
-	ResultDataVar.Status = "ok"
 	ResultDataVar.PriceChange = result
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(ResultDataVar)

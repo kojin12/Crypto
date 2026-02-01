@@ -1,19 +1,11 @@
 package logic
 
 import (
-	"errors"
 	"math"
 	"strconv"
 )
 
-func GetATR(candles [][]string, period int) (float64, error) {
-	if period <= 0 {
-		return 0, errors.New("period must be greater than 0")
-	}
-
-	if len(candles) < period {
-		return 0, errors.New("not enough candlesticks to calculate ATR")
-	}
+func GetATR(candles [][]string, period int) float64 {
 
 	lastCandles := candles[len(candles)-period:]
 	var sumTR float64
@@ -21,12 +13,12 @@ func GetATR(candles [][]string, period int) (float64, error) {
 	for i := range lastCandles {
 		high, err := strconv.ParseFloat(lastCandles[i][2], 64)
 		if err != nil {
-			return 0, err
+			return 0
 		}
 
 		low, err := strconv.ParseFloat(lastCandles[i][3], 64)
 		if err != nil {
-			return 0, err
+			return 0
 		}
 
 		if i == 0 {
@@ -37,7 +29,7 @@ func GetATR(candles [][]string, period int) (float64, error) {
 
 		prevClose, err := strconv.ParseFloat(lastCandles[i-1][4], 64)
 		if err != nil {
-			return 0, err
+			return 0
 		}
 
 		rangeHL := high - low
@@ -48,5 +40,5 @@ func GetATR(candles [][]string, period int) (float64, error) {
 		sumTR += tr
 	}
 
-	return sumTR / float64(period), nil
+	return sumTR / float64(period)
 }

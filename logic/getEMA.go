@@ -1,28 +1,17 @@
 package logic
 
 import (
-	"errors"
 	"strconv"
 )
 
-func GetEMA(candles [][]string, count int) (float64, error) {
-	if count <= 0 {
-		return 0, errors.New("period must be > 0")
-	}
-
-	if len(candles) < count {
-		return 0, errors.New("not enough candles to calculate EMA")
-	}
+func GetEMA(candles [][]string, count int) float64 {
 
 	var closes []float64
 	for _, c := range candles {
-		if len(c) <= 4 {
-			return 0, errors.New("invalid candle format")
-		}
 
 		price, err := strconv.ParseFloat(c[4], 64)
 		if err != nil {
-			return 0, err
+			return 0
 		}
 		closes = append(closes, price)
 	}
@@ -39,17 +28,10 @@ func GetEMA(candles [][]string, count int) (float64, error) {
 		ema = price*k + ema*(1-k)
 	}
 
-	return ema, nil
+	return ema
 }
 
-func GetEMAFromCloses(closes []float64, count int) (float64, error) {
-	if count <= 0 {
-		return 0, errors.New("period must be > 0")
-	}
-
-	if len(closes) < count {
-		return 0, errors.New("not enough values to calculate EMA")
-	}
+func GetEMAFromCloses(closes []float64, count int) float64 {
 
 	k := 2.0 / float64(count+1)
 
@@ -63,5 +45,5 @@ func GetEMAFromCloses(closes []float64, count int) (float64, error) {
 		ema = price*k + ema*(1-k)
 	}
 
-	return ema, nil
+	return ema
 }

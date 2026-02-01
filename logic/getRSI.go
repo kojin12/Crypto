@@ -1,26 +1,21 @@
 package logic
 
 import (
-	"errors"
 	"math"
 	"strconv"
 )
 
-func GetRSI(candles [][]string) (float64, error) {
+func GetRSI(candles [][]string) float64 {
 	period := 14
-
-	if len(candles) <= period {
-		return 0, errors.New("not enough candles for RSI calculation")
-	}
 
 	var closes []float64
 	for _, c := range candles {
 		if len(c) < 5 {
-			return 0, errors.New("invalid candle format")
+			return 0
 		}
 		price, err := strconv.ParseFloat(c[4], 64)
 		if err != nil {
-			return 0, err
+			return 0
 		}
 		closes = append(closes, price)
 	}
@@ -39,10 +34,6 @@ func GetRSI(candles [][]string) (float64, error) {
 		}
 	}
 
-	if len(gains) < period {
-		return 0, errors.New("insufficient price movement data")
-	}
-
 	sumGains := 0.0
 	sumLosses := 0.0
 
@@ -57,11 +48,11 @@ func GetRSI(candles [][]string) (float64, error) {
 	avgLoss := sumLosses / float64(period)
 
 	if avgLoss == 0 {
-		return 100.0, nil
+		return 100.0
 	}
 
 	rs := avgGain / avgLoss
 	rsi := 100 - (100 / (1 + rs))
 
-	return rsi, nil
+	return rsi
 }
