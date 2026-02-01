@@ -3,6 +3,10 @@ package logic
 import "math"
 
 func GetADX(candles []OHLC, period int) float64 {
+	if len(candles) < period+1 {
+		return 0
+	}
+
 	trs := make([]float64, len(candles))
 	plusDMs := make([]float64, len(candles))
 	minusDMs := make([]float64, len(candles))
@@ -11,7 +15,13 @@ func GetADX(candles []OHLC, period int) float64 {
 		curr := candles[i]
 		prev := candles[i-1]
 
-		tr := math.Max(curr.High-curr.Low, math.Max(math.Abs(curr.High-prev.Close), math.Abs(curr.Low-prev.Close)))
+		tr := math.Max(
+			curr.High-curr.Low,
+			math.Max(
+				math.Abs(curr.High-prev.Close),
+				math.Abs(curr.Low-prev.Close),
+			),
+		)
 		trs[i] = tr
 
 		upMove := curr.High - prev.High
@@ -19,20 +29,14 @@ func GetADX(candles []OHLC, period int) float64 {
 
 		if upMove > downMove && upMove > 0 {
 			plusDMs[i] = upMove
-		} else {
-			plusDMs[i] = 0
 		}
 
 		if downMove > upMove && downMove > 0 {
 			minusDMs[i] = downMove
-		} else {
-			minusDMs[i] = 0
 		}
 	}
 
-	smTR := 0.0
-	smPlus := 0.0
-	smMinus := 0.0
+	var smTR, smPlus, smMinus float64
 	for i := 1; i <= period; i++ {
 		smTR += trs[i]
 		smPlus += plusDMs[i]
@@ -45,10 +49,16 @@ func GetADX(candles []OHLC, period int) float64 {
 		smMinus = smMinus - (smMinus / float64(period)) + minusDMs[i]
 	}
 
+	if smTR == 0 {
+		return 0
+	}
+
 	diPlus := (smPlus / smTR) * 100
 	diMinus := (smMinus / smTR) * 100
-	dx := (math.Abs(diPlus-diMinus) / (diPlus + diMinus)) * 100
-	adx := dx
 
-	return adx
+	if diPlus+diMinus == 0 {
+		return 0
+	}
+
+	return (math.Abs(diPlus-diMinus) / (diPlus + diMinus)) * 100
 }

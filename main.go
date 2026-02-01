@@ -1,20 +1,14 @@
 package main
 
 import (
-	"fmt"
-	logic "main/logic"
-	getdatamexc "main/logic/getDataMexc"
-	"time"
+	"log"
+	"main/routes"
+	"net/http"
 )
 
 func main() {
-	zoraOHLC, price := getdatamexc.GetMexcOHLC("BULLAUSDT", "60m", "200")
-	time.Sleep(2 * time.Second)
-	zoraOHLC60, _ := getdatamexc.GetMexcOHLC("BULLAUSDT", "4h", "200")
-	time.Sleep(2 * time.Second)
-	res := logic.Final(zoraOHLC, zoraOHLC60)
-	sc := logic.GetScore(res, price)
+	router := routes.GetNewRouter()
 
-	fmt.Println("Result", price, res, sc)
-
+	log.Println("server started :8080")
+	log.Fatal(http.ListenAndServe(":8080", router))
 }

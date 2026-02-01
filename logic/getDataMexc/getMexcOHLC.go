@@ -13,7 +13,7 @@ import (
 func GetMexcOHLC(symbol, timeframe, limit string) ([][]string, float64) {
 	u, err := url.Parse("https://api.mexc.com/api/v3/klines")
 	if err != nil {
-		panic(err)
+		fmt.Println("Ошибка", err)
 	}
 
 	params := url.Values{}
@@ -24,18 +24,18 @@ func GetMexcOHLC(symbol, timeframe, limit string) ([][]string, float64) {
 
 	resp, err := http.Get(u.String())
 	if err != nil {
-		panic(err)
+		fmt.Println("Ошибка", err)
 	}
 	defer resp.Body.Close()
 
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		panic(err)
+		fmt.Println("Ошибка", err)
 	}
 
 	var raw [][]interface{}
 	if err := json.Unmarshal(body, &raw); err != nil {
-		panic(err)
+		fmt.Println("Ошибка", err)
 	}
 
 	if len(raw) == 0 {
