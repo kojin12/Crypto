@@ -3,6 +3,7 @@ package handlers
 import (
 	"encoding/json"
 	"log"
+	"main/config"
 	"main/logic"
 	getdatamexc "main/logic/getDataMexc"
 	"net/http"
@@ -38,13 +39,17 @@ func GetDataHandlers(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "market is required", http.StatusBadRequest)
 		return
 	}
-
 	var response logic.FinalResult
 	var score int
 
+	pairSymbol, ok := config.CoinConfig[pair]
+	if !ok {
+		http.Error(w, "unknown pair", http.StatusBadRequest)
+	}
+
 	if market == "mexc" {
-		ohlc, price := getdatamexc.GetMexcOHLC(pair, timeFrame, limit)
-		ohlc60, _ := getdatamexc.GetMexcOHLC(pair, "60m", limit)
+		ohlc, price := getdatamexc.GetMexcOHLC(pairSymbol.Mexc, timeFrame, limit)
+		ohlc60, _ := getdatamexc.GetMexcOHLC(pairSymbol.Mexc, "60m", limit)
 
 		response = logic.Final(ohlc, ohlc60)
 		score = logic.GetScore(response, price)

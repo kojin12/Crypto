@@ -3,6 +3,7 @@ package handlers
 import (
 	"encoding/json"
 	coingeckodata "main/coinGeckoData"
+	"main/config"
 	"net/http"
 )
 
@@ -23,8 +24,13 @@ func GetPriceChangeHandlers(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	pairSymbol, ok := config.CoinConfig[pair]
+	if !ok {
+		http.Error(w, "unknown pair", http.StatusBadRequest)
+	}
+
 	var ResultDataVar ResultData
-	result, err := coingeckodata.GetPriceChange(pair)
+	result, err := coingeckodata.GetPriceChange(pairSymbol.CoinGecko)
 	if err != nil {
 	}
 
