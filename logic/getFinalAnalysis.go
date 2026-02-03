@@ -51,7 +51,7 @@ func Final(candles [][]string, candles60 [][]string) FinalResult {
 	} else if res.Rsi < 30 {
 		res.RsiFilter = "Dont Sell"
 	}
-
+	res.RsiFilter = "Neutral"
 	macd := GetMACD(candles)
 
 	res.MACD = macd
